@@ -3,6 +3,7 @@ import itertools
 import json
 import math
 import requests
+import sys
 
 
 def mine(obj, diff):
@@ -11,7 +12,6 @@ def mine(obj, diff):
 
     for nonce in itertools.count(0):
         string = serial % (nonce)
-        print string
         h = hashlib.sha256(string)
         digest = h.digest()
 
@@ -28,7 +28,14 @@ def mine(obj, diff):
             return nonce
 
 
-block = requests.get('https://hackattic.com/challenges/mini_miner/problem?access_token=ae44cd88619c6ff5').json()
-nonce = mine(block['block'], block['difficulty'])
-r = requests.post('https://hackattic.com/challenges/mini_miner/solve?access_token=ae44cd88619c6ff5', data = json.dumps({'nonce': nonce})).json()
-print r
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print >>sys.stderr, 'usage: help_me_unpack.py <hackattic_key>'
+        sys.exit(1)
+
+    key = sys.argv[1]
+
+    block = requests.get('https://hackattic.com/challenges/mini_miner/problem?access_token=%s' % (key)).json()
+    nonce = mine(block['block'], block['difficulty'])
+    r = requests.post('https://hackattic.com/challenges/mini_miner/solve?access_token=%s' % (key), data = json.dumps({'nonce': nonce})).json()
+    print r

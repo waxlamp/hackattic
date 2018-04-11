@@ -2,6 +2,7 @@ import base64
 import json
 import requests
 import struct
+import sys
 
 
 def go(obj):
@@ -24,8 +25,15 @@ def go(obj):
             'big_endian_double': big_endian_doublev}
 
 
-obj = requests.get('https://hackattic.com/challenges/help_me_unpack/problem?access_token=ae44cd88619c6ff5').json()
-resp = go(obj)
-print resp
-r = requests.post('https://hackattic.com/challenges/help_me_unpack/solve?access_token=ae44cd88619c6ff5', data = json.dumps(resp)).json()
-print r
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print >>sys.stderr, 'usage: help_me_unpack.py <hackattic_key>'
+        sys.exit(1)
+
+    key = sys.argv[1]
+
+    obj = requests.get('https://hackattic.com/challenges/help_me_unpack/problem?access_token=%s' % (key)).json()
+    resp = go(obj)
+    print resp
+    r = requests.post('https://hackattic.com/challenges/help_me_unpack/solve?access_token=%s' % (key), data = json.dumps(resp)).json()
+    print r
